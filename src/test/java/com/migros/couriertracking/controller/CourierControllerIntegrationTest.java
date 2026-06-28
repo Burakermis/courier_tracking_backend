@@ -59,6 +59,7 @@ class CourierControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").exists())
                 .andExpect(jsonPath("$.success").value(false));
     }
 

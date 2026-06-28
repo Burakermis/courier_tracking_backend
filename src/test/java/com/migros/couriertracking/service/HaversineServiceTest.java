@@ -55,8 +55,8 @@ class HaversineServiceTest {
         double distance = haversineService.calculateDistance(
                 40.9923307, 29.1244229,
                 40.986106, 29.1161293);
-        // Distance should be approximately 785 meters
-        assertThat(distance).isCloseTo(850.0, within(100.0));
+        // Distance should be approximately 981 meters
+        assertThat(distance).isCloseTo(981.0, within(50.0));
     }
 
     @Test
