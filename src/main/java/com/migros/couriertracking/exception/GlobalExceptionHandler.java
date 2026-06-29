@@ -15,19 +15,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CourierNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCourierNotFound(
-            CourierNotFoundException ex, HttpServletRequest request) {
-        log.warn("Courier not found: {}", ex.getMessage());
-        ErrorResponse error = ErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .error("Not Found")
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
-
     @ExceptionHandler(InvalidCourierException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCourier(
             InvalidCourierException ex, HttpServletRequest request) {

@@ -7,7 +7,6 @@ import com.migros.couriertracking.entity.Courier;
 import com.migros.couriertracking.entity.CourierLocation;
 import com.migros.couriertracking.entity.Store;
 import com.migros.couriertracking.entity.StoreEntry;
-import com.migros.couriertracking.exception.CourierNotFoundException;
 import com.migros.couriertracking.exception.InvalidCourierException;
 import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
@@ -114,7 +113,7 @@ public class CourierServiceImpl implements CourierService {
     @Override
     public CourierTotalDistanceResponse getTotalDistance(String courierId) {
         Courier courier = courierRepository.findByCourierId(courierId)
-                .orElseThrow(() -> new CourierNotFoundException("Courier not found: " + courierId));
+                .orElseThrow(() -> new InvalidCourierException("Courier not found: " + courierId));
 
         return CourierTotalDistanceResponse.builder()
                 .courierId(courierId)
@@ -126,7 +125,7 @@ public class CourierServiceImpl implements CourierService {
     @Override
     public List<StoreEntryResponse> getStoreEntries(String courierId) {
         if (!courierRepository.existsByCourierId(courierId)) {
-            throw new CourierNotFoundException("Courier not found: " + courierId);
+            throw new InvalidCourierException("Courier not found: " + courierId);
         }
         return storeEntryRepository.findByCourierIdOrderByEntryTimeDesc(courierId)
                 .stream()

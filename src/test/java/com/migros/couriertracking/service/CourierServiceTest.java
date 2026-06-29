@@ -5,7 +5,6 @@ import com.migros.couriertracking.dto.CourierTotalDistanceResponse;
 import com.migros.couriertracking.entity.Courier;
 import com.migros.couriertracking.entity.Store;
 import com.migros.couriertracking.entity.StoreEntry;
-import com.migros.couriertracking.exception.CourierNotFoundException;
 import com.migros.couriertracking.exception.InvalidCourierException;
 import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
@@ -189,12 +188,12 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("getTotalDistance should throw CourierNotFoundException for unknown courier")
+    @DisplayName("getTotalDistance should throw InvalidCourierException for unknown courier")
     void testGetTotalDistanceThrowsForUnknownCourier() {
         when(courierRepository.findByCourierId("unknown")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> courierService.getTotalDistance("unknown"))
-                .isInstanceOf(CourierNotFoundException.class)
+                .isInstanceOf(InvalidCourierException.class)
                 .hasMessageContaining("unknown");
     }
 

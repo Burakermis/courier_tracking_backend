@@ -105,11 +105,11 @@ class CourierControllerIntegrationTest {
 
     @Test
     @Order(4)
-    @DisplayName("GET /api/couriers/{id}/total-distance - should return 404 for unknown courier")
-    void testGetTotalDistanceReturns404ForUnknownCourier() throws Exception {
+    @DisplayName("GET /api/couriers/{id}/total-distance - should return 400 for unknown courier")
+    void testGetTotalDistanceReturns400ForUnknownCourier() throws Exception {
         mockMvc.perform(get("/api/couriers/nonexistent-courier/total-distance"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value(404));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
