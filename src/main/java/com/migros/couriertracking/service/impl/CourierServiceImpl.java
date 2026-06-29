@@ -5,19 +5,16 @@ import com.migros.couriertracking.dto.CourierTotalDistanceResponse;
 import com.migros.couriertracking.dto.StoreEntryResponse;
 import com.migros.couriertracking.entity.Courier;
 import com.migros.couriertracking.entity.CourierLocation;
-import com.migros.couriertracking.entity.Store;
-import com.migros.couriertracking.entity.StoreEntry;
+import com.migros.couriertracking.event.CourierLocationUpdatedEvent;
 import com.migros.couriertracking.exception.InvalidCourierException;
 import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
 import com.migros.couriertracking.repository.StoreEntryRepository;
-import com.migros.couriertracking.repository.StoreRepository;
 import com.migros.couriertracking.service.contract.CourierService;
-import com.migros.couriertracking.service.strategy.DistanceStrategy;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,15 +27,8 @@ public class CourierServiceImpl implements CourierService {
 
     private final CourierRepository courierRepository;
     private final CourierLocationRepository courierLocationRepository;
-    private final StoreRepository storeRepository;
     private final StoreEntryRepository storeEntryRepository;
-    private final DistanceStrategy distanceStrategy;
-
-    @Value("${courier.tracking.store-radius-meters:100.0}")
-    private double storeRadiusMeters;
-
-    @Value("${courier.tracking.reentry-cooldown-minutes:1}")
-    private long reentryCooldownMinutes;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -57,52 +47,9 @@ public class CourierServiceImpl implements CourierService {
                 .timestamp(timestamp)
                 .build());
 
-        if (courier.getLastLatitude() != null && courier.getLastLongitude() != null) {
-            double distance = distanceStrategy.calculateDistance(
-                    courier.getLastLatitude(), courier.getLastLongitude(),
-                    request.getLatitude(), request.getLongitude());
-            courier.setTotalDistance(courier.getTotalDistance() + distance);
-            log.debug("Courier {} traveled {} meters (total: {} m)",
-                    request.getCourierId(), String.format("%.2f", distance),
-                    String.format("%.2f", courier.getTotalDistance()));
-        }
-
-        courier.setLastLatitude(request.getLatitude());
-        courier.setLastLongitude(request.getLongitude());
-        courierRepository.save(courier);
-
-        checkStoreProximity(request.getCourierId(), request.getLatitude(), request.getLongitude(), timestamp);
-    }
-
-    private void checkStoreProximity(String courierId, double lat, double lng, LocalDateTime timestamp) {
-        List<Store> stores = storeRepository.findAll();
-
-        for (Store store : stores) {
-            double distance = distanceStrategy.calculateDistance(
-                    lat, lng, store.getLatitude(), store.getLongitude());
-
-            if (distance <= storeRadiusMeters) {
-                LocalDateTime cooldownThreshold = timestamp.minusMinutes(reentryCooldownMinutes);
-
-                boolean recentEntry = storeEntryRepository
-                        .findTopByCourierIdAndStoreIdOrderByEntryTimeDesc(courierId, store.getId())
-                        .map(entry -> entry.getEntryTime().isAfter(cooldownThreshold))
-                        .orElse(false);
-
-                if (!recentEntry) {
-                    storeEntryRepository.save(StoreEntry.builder()
-                            .courierId(courierId)
-                            .store(store)
-                            .entryTime(timestamp)
-                            .build());
-                    log.info("[STORE ENTRY] Courier '{}' entered '{}' at {} (distance: {:.2f}m)",
-                            courierId, store.getName(), timestamp, distance);
-                } else {
-                    log.debug("[COOLDOWN] Courier '{}' near '{}' but within cooldown period",
-                            courierId, store.getName());
-                }
-            }
-        }
+        // Publish event for observers
+        CourierLocationUpdatedEvent event = new CourierLocationUpdatedEvent(this, courier, request, timestamp);
+        applicationEventPublisher.publishEvent(event);
     }
 
     @Override
