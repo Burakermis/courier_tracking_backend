@@ -4,7 +4,7 @@ import com.migros.couriertracking.dto.ApiResponse;
 import com.migros.couriertracking.dto.CourierLocationRequest;
 import com.migros.couriertracking.dto.CourierTotalDistanceResponse;
 import com.migros.couriertracking.dto.StoreEntryResponse;
-import com.migros.couriertracking.service.CourierService;
+import com.migros.couriertracking.service.contract.CourierService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.List;
 
 @RestController
@@ -71,5 +72,12 @@ public class CourierController {
             @PathVariable String courierId) {
         List<StoreEntryResponse> entries = courierService.getStoreEntries(courierId);
         return ResponseEntity.ok(ApiResponse.success(entries));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponse<Void>> handleValidationExceptions(MethodArgumentNotValidException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.failure("Validation failed", null));
     }
 }

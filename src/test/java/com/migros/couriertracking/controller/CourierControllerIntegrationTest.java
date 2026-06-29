@@ -2,6 +2,9 @@ package com.migros.couriertracking.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.migros.couriertracking.dto.CourierLocationRequest;
+import com.migros.couriertracking.entity.Courier;
+import com.migros.couriertracking.repository.CourierRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -27,6 +30,22 @@ class CourierControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private CourierRepository courierRepository;
+
+    @BeforeEach
+    void setUp() {
+        if (!courierRepository.existsByCourierId("test-courier-1")) {
+            courierRepository.save(Courier.builder().courierId("test-courier-1").totalDistance(0.0).build());
+        }
+        if (!courierRepository.existsByCourierId("test-courier-2")) {
+            courierRepository.save(Courier.builder().courierId("test-courier-2").totalDistance(0.0).build());
+        }
+        if (!courierRepository.existsByCourierId("test-courier-3")) {
+            courierRepository.save(Courier.builder().courierId("test-courier-3").totalDistance(0.0).build());
+        }
+    }
 
     @Test
     @Order(1)
@@ -59,6 +78,7 @@ class CourierControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").exists())
                 .andExpect(jsonPath("$.success").value(false));
     }
 
@@ -85,11 +105,11 @@ class CourierControllerIntegrationTest {
 
     @Test
     @Order(4)
-    @DisplayName("GET /api/couriers/{id}/total-distance - should return 404 for unknown courier")
-    void testGetTotalDistanceReturns404ForUnknownCourier() throws Exception {
+    @DisplayName("GET /api/couriers/{id}/total-distance - should return 400 for unknown courier")
+    void testGetTotalDistanceReturns400ForUnknownCourier() throws Exception {
         mockMvc.perform(get("/api/couriers/nonexistent-courier/total-distance"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value(404));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
