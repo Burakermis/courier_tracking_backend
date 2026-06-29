@@ -6,6 +6,7 @@ import com.migros.couriertracking.entity.Courier;
 import com.migros.couriertracking.entity.Store;
 import com.migros.couriertracking.entity.StoreEntry;
 import com.migros.couriertracking.exception.CourierNotFoundException;
+import com.migros.couriertracking.exception.InvalidCourierException;
 import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
 import com.migros.couriertracking.repository.StoreEntryRepository;
@@ -58,8 +59,8 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("New courier should be created on first location update")
-    void testNewCourierCreatedOnFirstUpdate() {
+    @DisplayName("processLocation should throw InvalidCourierException when courier not found")
+    void testProcessLocationThrowsExceptionWhenCourierNotFound() {
         CourierLocationRequest request = CourierLocationRequest.builder()
                 .courierId("courier-001")
                 .latitude(40.9923307)
@@ -67,13 +68,10 @@ class CourierServiceTest {
                 .build();
 
         when(courierRepository.findByCourierId("courier-001")).thenReturn(Optional.empty());
-        when(courierRepository.save(any(Courier.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(courierLocationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(storeRepository.findAll()).thenReturn(List.of());
 
-        courierService.processLocation(request);
-
-        verify(courierRepository, times(2)).save(any(Courier.class));
+        assertThatThrownBy(() -> courierService.processLocation(request))
+                .isInstanceOf(InvalidCourierException.class)
+                .hasMessageContaining("courier-001");
     }
 
     @Test

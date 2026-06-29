@@ -2,6 +2,9 @@ package com.migros.couriertracking.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.migros.couriertracking.dto.CourierLocationRequest;
+import com.migros.couriertracking.entity.Courier;
+import com.migros.couriertracking.repository.CourierRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -27,6 +30,22 @@ class CourierControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private CourierRepository courierRepository;
+
+    @BeforeEach
+    void setUp() {
+        if (!courierRepository.existsByCourierId("test-courier-1")) {
+            courierRepository.save(Courier.builder().courierId("test-courier-1").totalDistance(0.0).build());
+        }
+        if (!courierRepository.existsByCourierId("test-courier-2")) {
+            courierRepository.save(Courier.builder().courierId("test-courier-2").totalDistance(0.0).build());
+        }
+        if (!courierRepository.existsByCourierId("test-courier-3")) {
+            courierRepository.save(Courier.builder().courierId("test-courier-3").totalDistance(0.0).build());
+        }
+    }
 
     @Test
     @Order(1)

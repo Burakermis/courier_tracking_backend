@@ -8,6 +8,7 @@ import com.migros.couriertracking.entity.CourierLocation;
 import com.migros.couriertracking.entity.Store;
 import com.migros.couriertracking.entity.StoreEntry;
 import com.migros.couriertracking.exception.CourierNotFoundException;
+import com.migros.couriertracking.exception.InvalidCourierException;
 import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
 import com.migros.couriertracking.repository.StoreEntryRepository;
@@ -47,15 +48,9 @@ public class CourierServiceImpl implements CourierService {
                 ? request.getTimestamp()
                 : LocalDateTime.now();
 
-        // Step 1: Get or create courier
+        // Step 1: Get courier
         Courier courier = courierRepository.findByCourierId(request.getCourierId())
-                .orElseGet(() -> {
-                    log.info("Creating new courier: {}", request.getCourierId());
-                    return courierRepository.save(Courier.builder()
-                            .courierId(request.getCourierId())
-                            .totalDistance(0.0)
-                            .build());
-                });
+                .orElseThrow(() -> new InvalidCourierException("Courier not found with ID: " + request.getCourierId()));
 
         // Step 2: Save location log
         courierLocationRepository.save(CourierLocation.builder()
