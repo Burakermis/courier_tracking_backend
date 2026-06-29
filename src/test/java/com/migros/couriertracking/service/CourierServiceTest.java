@@ -10,6 +10,8 @@ import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
 import com.migros.couriertracking.repository.StoreEntryRepository;
 import com.migros.couriertracking.repository.StoreRepository;
+import com.migros.couriertracking.service.impl.CourierServiceImpl;
+import com.migros.couriertracking.service.strategy.DistanceStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,10 +37,10 @@ class CourierServiceTest {
     @Mock private CourierLocationRepository courierLocationRepository;
     @Mock private StoreRepository storeRepository;
     @Mock private StoreEntryRepository storeEntryRepository;
-    @Mock private HaversineService haversineService;
+    @Mock private DistanceStrategy distanceStrategy;
 
     @InjectMocks
-    private CourierService courierService;
+    private CourierServiceImpl courierService;
 
     private Store atasehirStore;
 
@@ -93,7 +95,7 @@ class CourierServiceTest {
         when(courierRepository.save(any())).thenReturn(courier);
         when(courierLocationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(storeRepository.findAll()).thenReturn(List.of(atasehirStore));
-        when(haversineService.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(50.0); // 50m - inside radius
+        when(distanceStrategy.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(50.0); // 50m - inside radius
         when(storeEntryRepository.findTopByCourierIdAndStoreIdOrderByEntryTimeDesc(anyString(), anyLong()))
                 .thenReturn(Optional.empty());
         when(storeEntryRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -118,7 +120,7 @@ class CourierServiceTest {
         when(courierRepository.save(any())).thenReturn(courier);
         when(courierLocationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(storeRepository.findAll()).thenReturn(List.of(atasehirStore));
-        when(haversineService.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(500.0); // 500m - outside radius
+        when(distanceStrategy.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(500.0); // 500m - outside radius
 
         courierService.processLocation(request);
 
@@ -147,7 +149,7 @@ class CourierServiceTest {
         when(courierRepository.save(any())).thenReturn(courier);
         when(courierLocationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(storeRepository.findAll()).thenReturn(List.of(atasehirStore));
-        when(haversineService.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(50.0);
+        when(distanceStrategy.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(50.0);
         when(storeEntryRepository.findTopByCourierIdAndStoreIdOrderByEntryTimeDesc(anyString(), anyLong()))
                 .thenReturn(Optional.of(recentEntry));
 
@@ -178,7 +180,7 @@ class CourierServiceTest {
         when(courierRepository.save(any())).thenReturn(courier);
         when(courierLocationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(storeRepository.findAll()).thenReturn(List.of(atasehirStore));
-        when(haversineService.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(50.0);
+        when(distanceStrategy.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(50.0);
         when(storeEntryRepository.findTopByCourierIdAndStoreIdOrderByEntryTimeDesc(anyString(), anyLong()))
                 .thenReturn(Optional.of(oldEntry));
         when(storeEntryRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
