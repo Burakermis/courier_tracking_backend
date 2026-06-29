@@ -4,7 +4,7 @@ import com.migros.couriertracking.dto.ApiResponse;
 import com.migros.couriertracking.dto.CourierLocationRequest;
 import com.migros.couriertracking.dto.CourierTotalDistanceResponse;
 import com.migros.couriertracking.dto.StoreEntryResponse;
-import com.migros.couriertracking.service.CourierService;
+import com.migros.couriertracking.service.contract.CourierService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -76,7 +76,7 @@ public class CourierController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ApiResponse<Void>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleValidationExceptions(MethodArgumentNotValidException exception) {
         return ResponseEntity.badRequest()
                 .body(ApiResponse.failure("Validation failed", null));
     }

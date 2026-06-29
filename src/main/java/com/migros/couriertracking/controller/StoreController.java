@@ -2,7 +2,7 @@ package com.migros.couriertracking.controller;
 
 import com.migros.couriertracking.dto.ApiResponse;
 import com.migros.couriertracking.entity.Store;
-import com.migros.couriertracking.service.StoreService;
+import com.migros.couriertracking.service.contract.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;

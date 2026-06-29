@@ -2,11 +2,6 @@ package com.migros.couriertracking.service.strategy;
 
 import org.springframework.stereotype.Component;
 
-/**
- * Implementation of DistanceStrategy using the Haversine formula.
- * The Haversine formula determines the great-circle distance between two points
- * on a sphere given their latitudes and longitudes.
- */
 @Component
 public class HaversineDistanceStrategy implements DistanceStrategy {
 

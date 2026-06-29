@@ -12,7 +12,7 @@ import com.migros.couriertracking.repository.CourierLocationRepository;
 import com.migros.couriertracking.repository.CourierRepository;
 import com.migros.couriertracking.repository.StoreEntryRepository;
 import com.migros.couriertracking.repository.StoreRepository;
-import com.migros.couriertracking.service.CourierService;
+import com.migros.couriertracking.service.contract.CourierService;
 import com.migros.couriertracking.service.strategy.DistanceStrategy;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -47,11 +47,9 @@ public class CourierServiceImpl implements CourierService {
                 ? request.getTimestamp()
                 : LocalDateTime.now();
 
-        // Step 1: Get courier
         Courier courier = courierRepository.findByCourierId(request.getCourierId())
                 .orElseThrow(() -> new InvalidCourierException("Courier not found with ID: " + request.getCourierId()));
 
-        // Step 2: Save location log
         courierLocationRepository.save(CourierLocation.builder()
                 .courierId(request.getCourierId())
                 .latitude(request.getLatitude())
@@ -59,7 +57,6 @@ public class CourierServiceImpl implements CourierService {
                 .timestamp(timestamp)
                 .build());
 
-        // Step 3: Calculate and accumulate travel distance
         if (courier.getLastLatitude() != null && courier.getLastLongitude() != null) {
             double distance = distanceStrategy.calculateDistance(
                     courier.getLastLatitude(), courier.getLastLongitude(),
@@ -70,12 +67,10 @@ public class CourierServiceImpl implements CourierService {
                     String.format("%.2f", courier.getTotalDistance()));
         }
 
-        // Step 4: Update last known position
         courier.setLastLatitude(request.getLatitude());
         courier.setLastLongitude(request.getLongitude());
         courierRepository.save(courier);
 
-        // Step 5: Check proximity to all stores
         checkStoreProximity(request.getCourierId(), request.getLatitude(), request.getLongitude(), timestamp);
     }
 
