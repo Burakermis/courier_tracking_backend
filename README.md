@@ -1,4 +1,4 @@
-# 🚚 Migros Courier Tracking Service
+# 🚚 Courier Tracking Service
 
 A real-time courier location tracking backend built with **Java 17** and **Spring Boot 3**.
 
