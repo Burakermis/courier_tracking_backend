@@ -9,11 +9,11 @@
         <version>3.2.5</version>
         <relativePath/>
     </parent>
-    <groupId>com.migros</groupId>
+    <groupId>com.ermis_market</groupId>
     <artifactId>courier-tracking</artifactId>
     <version>1.0.0</version>
     <name>courier-tracking</name>
-    <description>Migros Courier Tracking Case - Real-time courier location tracking service</description>
+    <description>Ermiş Market Courier Tracking Case - Real-time courier location tracking service</description>
     <properties>
         <java.version>17</java.version>
     </properties>

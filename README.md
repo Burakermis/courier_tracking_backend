@@ -1,4 +1,4 @@
-# 🚚 Courier Tracking Service
+# 🚚 Ermiş Market Courier Tracking Service
 
 A real-time courier location tracking backend built with **Java 17** and **Spring Boot 3**.
 
@@ -25,7 +25,7 @@ A real-time courier location tracking backend built with **Java 17** and **Sprin
 | Feature | Description |
 |---|---|
 | 📍 **Real-time Location Ingestion** | REST endpoint to stream courier GPS coordinates |
-| 🏪 **Store Proximity Detection** | Detects when a courier enters 100m radius of a Migros store |
+| 🏪 **Store Proximity Detection** | Detects when a courier enters 100m radius of a Ermiş Market store |
 | ⏱️ **Re-entry Cooldown** | Prevents duplicate store entry logs within 1 minute |
 | 📏 **Total Distance Tracking** | Accumulates travel distance using the Haversine formula |
 | 📚 **Swagger UI** | Interactive API documentation |
@@ -71,7 +71,7 @@ This project applies core GoF design patterns to ensure clean, maintainable, and
 
 ```bash
 # 1. Clone / navigate to project
-cd migros_java_case
+cd ermis_market_java_case
 
 # 2. Build and start
 docker compose up --build
@@ -91,24 +91,11 @@ docker compose down
 ### Windows
 
 ```bat
-run.bat
-```
-
-Or manually:
-
-```bat
 mvn clean package -DskipTests
 java -jar target\courier-tracking-1.0.0.jar
 ```
 
 ### Linux / macOS
-
-```bash
-chmod +x run.sh
-./run.sh
-```
-
-Or manually:
 
 ```bash
 mvn clean package -DskipTests
@@ -175,7 +162,7 @@ Get total travel distance for a courier.
 ---
 
 ### GET `/api/couriers/{courierId}/store-entries`
-Get all Migros store entry logs for a courier.
+Get all Ermiş Market store entry logs for a courier.
 
 **Response (200 OK):**
 ```json
@@ -183,7 +170,7 @@ Get all Migros store entry logs for a courier.
   "success": true,
   "data": [
     {
-      "storeName": "Ataşehir MMM Migros",
+      "storeName": "Ataşehir MMM Ermiş Market",
       "storeLatitude": 40.9923307,
       "storeLongitude": 29.1244229,
       "entryTime": "2024-01-15T10:30:00"
@@ -195,18 +182,18 @@ Get all Migros store entry logs for a courier.
 ---
 
 ### GET `/api/stores`
-List all loaded Migros stores.
+List all loaded Ermiş Market stores.
 
 **Response (200 OK):**
 ```json
 {
   "success": true,
   "data": [
-    { "id": 1, "name": "Ataşehir MMM Migros", "latitude": 40.9923307, "longitude": 29.1244229 },
-    { "id": 2, "name": "Novada MMM Migros",   "latitude": 40.986106,  "longitude": 29.1161293 },
-    { "id": 3, "name": "Beylikdüzü 5M Migros","latitude": 41.0066851, "longitude": 28.6552262 },
-    { "id": 4, "name": "Ortaköy MMM Migros",  "latitude": 41.055783,  "longitude": 29.0210292 },
-    { "id": 5, "name": "Caddebostan MMM Migros","latitude": 40.9632463,"longitude": 29.0630908 }
+    { "id": 1, "name": "Ataşehir MMM Ermiş Market", "latitude": 40.9923307, "longitude": 29.1244229 },
+    { "id": 2, "name": "Novada MMM Ermiş Market",   "latitude": 40.986106,  "longitude": 29.1161293 },
+    { "id": 3, "name": "Beylikdüzü 5M Ermiş Market","latitude": 41.0066851, "longitude": 28.6552262 },
+    { "id": 4, "name": "Ortaköy MMM Ermiş Market",  "latitude": 41.055783,  "longitude": 29.0210292 },
+    { "id": 5, "name": "Caddebostan MMM Ermiş Market","latitude": 40.9632463,"longitude": 29.0630908 }
   ]
 }
 ```
@@ -234,10 +221,10 @@ mvn test
 ## 📁 Project Structure
 
 ```text
-courier_tracking_migros/
+courier_tracking_ermis_market/
 ├── src/
 │   ├── main/
-│   │   ├── java/com/migros/couriertracking/
+│   │   ├── java/com/ermis_market/couriertracking/
 │   │   │   ├── CourierTrackingApplication.java   ← Entry point
 │   │   │   ├── config/
 │   │   │   │   ├── DataLoader.java               ← Loads stores.json on startup
@@ -260,12 +247,10 @@ courier_tracking_migros/
 │   │   │           └── HaversineDistanceStrategy.java    ← Haversine implementation
 │   │   └── resources/
 │   │       ├── application.yml                   ← App configuration
-│   │       └── stores.json                       ← Migros store data
+│   │       └── stores.json                       ← Ermiş Market store data
 │   └── test/                                     ← Unit & integration tests
 ├── Dockerfile
 ├── docker-compose.yml
-├── run.bat                                       ← Windows launcher
-├── run.sh                                        ← Linux/Mac launcher
 └── pom.xml
 ```
 
@@ -296,7 +281,7 @@ POST /api/couriers/locations
                  │        └─► Accumulate into courier.totalDistance & update last pos
                  │
                  └─► [StoreProximityObserver]
-                          └─► For each Migros store:
+                          └─► For each Ermiş Market store:
                                    ├─► distance ≤ 100m?
                                    │       ├─► YES → last entry > 1 min ago?
                                    │       │           ├─► YES → Save StoreEntry ✅
@@ -319,12 +304,12 @@ courier:
 
 ---
 
-## 🗺️ Preloaded Migros Stores
+## 🗺️ Preloaded Ermiş Market Stores
 
 | Store | Latitude | Longitude |
 |---|---|---|
-| Ataşehir MMM Migros | 40.9923307 | 29.1244229 |
-| Novada MMM Migros | 40.986106 | 29.1161293 |
-| Beylikdüzü 5M Migros | 41.0066851 | 28.6552262 |
-| Ortaköy MMM Migros | 41.055783 | 29.0210292 |
-| Caddebostan MMM Migros | 40.9632463 | 29.0630908 |
+| Ataşehir MMM Ermiş Market | 40.9923307 | 29.1244229 |
+| Novada MMM Ermiş Market | 40.986106 | 29.1161293 |
+| Beylikdüzü 5M Ermiş Market | 41.0066851 | 28.6552262 |
+| Ortaköy MMM Ermiş Market | 41.055783 | 29.0210292 |
+| Caddebostan MMM Ermiş Market | 40.9632463 | 29.0630908 |
